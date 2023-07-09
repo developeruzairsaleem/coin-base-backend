@@ -61,7 +61,7 @@ try {
     author,
     content,
     title,
-    photoPath:`${response.url}`
+    photoPath:response.url
    })
 
  await newBlog.save()
@@ -217,10 +217,10 @@ return next()
 //     delete previous photo
 //     save new photo
 if(photo){
-    let previousPhoto= blog.photoPath;
-    previousPhoto= previousPhoto.split("/").at(-1);
+    // let previousPhoto= blog.photoPath;
+    // previousPhoto= previousPhoto.split("/").at(-1);
     //delete photo
-    fs.unlinkSync(`storage/${previousPhoto}`)
+    // fs.unlinkSync(`storage/${previousPhoto}`)
     
 
     
@@ -240,7 +240,7 @@ response= await cloudinary.uploader.upload(photo)
     return next(error)
 }
 
-await Blog.updateOne({_id:blogId},{title,content,photoPath:`${response.url}`}    )
+await Blog.updateOne({_id:blogId},{title,content,photoPath:response.url}    )
 
 
 
