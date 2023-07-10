@@ -217,10 +217,10 @@ return next()
 //     delete previous photo
 //     save new photo
 if(photo){
-    // let previousPhoto= blog.photoPath;
-    // previousPhoto= previousPhoto.split("/").at(-1);
+    let previousPhoto= blog.photoPath;
+    previousPhoto= previousPhoto.split("/").at(-1);
     //delete photo
-    // fs.unlinkSync(`storage/${previousPhoto}`)
+    fs.unlinkSync(`storage/${previousPhoto}`)
     
 
     
