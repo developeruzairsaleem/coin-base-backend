@@ -88,7 +88,8 @@ res.cookie("accessToken",accessToken,{
 })
 res.cookie("refreshToken",refreshToken,{
     maxAge:1000*60*60*24, 
-    httpOnly:true,    sameSite:"None",
+    httpOnly:true, 
+    sameSite:"None",
     secure:true
 })
 
