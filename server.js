@@ -6,25 +6,25 @@ const errorHandler= require("./middlewares/errorHandler.js")
 const cookieParser=require("cookie-parser")
 const cors=require("cors");
 
-// const corsOptions={
-//     credentials:true,
-//     origin:"https://coin-base-app-by-uzair.onrender.com/"
-// }
+const corsOptions={
+    credentials:true,
+    origin:"https://coin-base-app-by-uzair.onrender.com"
+}
 dbConnect()
 
 const app=express()
-// app.use(cors(corsOptions))
-app.use(
-    cors(
-        {
-            origin:function(origin,callback){
-                return callback(null,true);
-            },
-            optionsSuccessStatus:200,
-            credentials:true
-        }
-    )
-)
+app.use(cors(corsOptions))
+// app.use(
+//     cors(
+//         {
+//             origin:function(origin,callback){
+//                 return callback(null,true);
+//             },
+//             optionsSuccessStatus:200,
+//             credentials:true
+//         }
+//     )
+// )
 
 // app.use("/storage",express.static("storage"))
 app.use(cookieParser())
