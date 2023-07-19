@@ -116,7 +116,14 @@ try {
     const blogDto= new BlogDto(blogs[i])
     blogAll.push(blogDto)
     }
-res.status(200).json({blogs:blogAll})
+let pageBlog=[]
+let i=0
+let blogNum= req.params.val
+let currentPage = blogAll.slice(blogNum,blogNum+10)
+
+
+
+res.status(200).json({blogs:currentPage,length:blogAll.length})
 
 } catch (error) {
     return next(error)
