@@ -9,6 +9,13 @@ const passwordPattern=/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,25}$/;
 
 const authController={
     async register(req,res,next){
+
+
+
+
+// Validate user with express validator
+
+
         //validate user
         const userRegisterSchema= Joi.object({
             username: Joi.string().max(30).min(5).required(),
@@ -18,6 +25,8 @@ const authController={
             confirmPassword: Joi.ref("password")
         })
 const {error}=userRegisterSchema.validate(req.body) 
+
+
 // if error in validation return error via middleware
 if(error){
 return next(error)

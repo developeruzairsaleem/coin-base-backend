@@ -3,6 +3,7 @@ const router = express.Router()
 const authController=require("../controllers/authController.js")
 const blogController=require("../controllers/blogController.js")
 const commentController=require("../controllers/commentController.js")
+const profileController = require( "../controllers/profileController.js" )
 const auth= require("../middlewares/auth.js")
 router.get("/test",(req,res)=>res.json("Working"))
 
@@ -30,6 +31,8 @@ router.post("/comment",auth,commentController.create)
 // get comments by id
 router.get("/comment/:id",auth,commentController.getById)
 
+// post profile picture
+router.post("/profile",auth,profileController.profile)
 
 module.exports=router;
 
