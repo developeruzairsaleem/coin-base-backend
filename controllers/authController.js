@@ -75,7 +75,7 @@ try {
     })
     user= await userToSave.save()
     accessToken= JWTService.signAccessToken({_id:user._id},"20s")
-    refreshToken= JWTService.signRefreshToken({_id:user.id},"1m")
+    refreshToken= JWTService.signRefreshToken({_id:user.id},"5m")
     
 
 
@@ -163,7 +163,7 @@ catch(error){
 }
 //tokens 
 const accessToken= JWTService.signAccessToken({_id:user._id},"20s")
-const refreshToken= JWTService.signRefreshToken({_id:user._id},"1m")
+const refreshToken= JWTService.signRefreshToken({_id:user._id},"5m")
 // store in db
 try{
 
@@ -253,7 +253,7 @@ catch(err){
 // 3  generate new tokens
 try {
     const accessToken=JWTService.signAccessToken({_id:id},"20s");
-    const refreshToken= JWTService.signRefreshToken({_id:id},"1m")
+    const refreshToken= JWTService.signRefreshToken({_id:id},"5m")
 
     await RefreshToken.updateOne({_id:id},{token:refreshToken})
     res.cookie("accessToken",accessToken,{
