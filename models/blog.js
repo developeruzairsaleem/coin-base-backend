@@ -8,7 +8,7 @@ const blogSchema= new Schema({
     author:{type: mongoose.SchemaTypes.ObjectId, ref: "User"}
 }
 ,{
-    timestamps:true
+    timestamps:true  
 }
 
 )

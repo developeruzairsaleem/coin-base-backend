@@ -30,8 +30,12 @@ const createBlogSchema= Joi.object({
     author: Joi.string().regex(mongodbIdPattern).required(),
     photo: Joi.string().required()
 })
+
+console.log(req.body,"request body")
 const {error}= createBlogSchema.validate(req.body)
 if(error){
+console.log(error,"validation error")
+
     return next()
 }
 const {title,author,content,photo,description}=req.body
@@ -47,6 +51,7 @@ let response;
 try{
 response = await cloudinary.uploader.upload(photo)
     // fs.writeFileSync(`storage/${imagePath}`,buffer)
+console.log("photo uploaded")
 
 }catch(error){
     return next(error)
@@ -66,15 +71,20 @@ try {
     photoPath:response.url
    })
 
+console.log("saving to db")
  await newBlog.save()
+console.log("saved to db")
+
 
 
 
 } catch (error) {
+    console.log("error saving to db")
     return next(error)
 }
 
 const myBlogDto= new BlogDto(newBlog)
+console.log("Saved and will return to client")
 res.status(201).json({blog:myBlogDto})
 
 
