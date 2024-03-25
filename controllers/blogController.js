@@ -26,6 +26,7 @@ async create(req,res,next){
 const createBlogSchema= Joi.object({
     title:Joi.string().required(),
     content:Joi.string().required(),
+    description:Joi.string().required(),
     author: Joi.string().regex(mongodbIdPattern).required(),
     photo: Joi.string().required()
 })
@@ -33,7 +34,7 @@ const {error}= createBlogSchema.validate(req.body)
 if(error){
     return next()
 }
-const {title,author,content,photo}=req.body
+const {title,author,content,photo,description}=req.body
 
 // read photo as a buffer
 // const buffer = Buffer.from(photo.replace(/^data:image\/(png|jpg|jpeg);base64,/,""),"base64");
@@ -59,6 +60,7 @@ try {
 
     newBlog= new Blog({
     author,
+    description,
     content,
     title,
     photoPath:response.url
@@ -116,14 +118,11 @@ try {
     const blogDto= new BlogDto(blogs[i])
     blogAll.push(blogDto)
     }
-let pageBlog=[]
-let i=0
-let blogNum= req.params.val
-let currentPage = blogAll.slice(blogNum,blogNum+10)
 
 
 
-res.status(200).json({blogs:currentPage,length:blogAll.length})
+
+res.status(200).json({blogs:blogAll})
 
 } catch (error) {
     return next(error)

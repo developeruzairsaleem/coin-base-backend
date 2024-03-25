@@ -6,6 +6,7 @@ class BlogDto{
             this.author= blog.author
             this.title= blog.title
             this.content= blog.content
+            this.description= blog.description
             this.photo=blog.photoPath
    
    
