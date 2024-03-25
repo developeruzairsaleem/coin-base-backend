@@ -233,10 +233,10 @@ return next()
 //     delete previous photo
 //     save new photo
 if(photo){
-    let previousPhoto= blog.photoPath;
-    previousPhoto= previousPhoto.split("/").at(-1);
-    //delete photo
-    fs.unlinkSync(`storage/${previousPhoto}`)
+    // let previousPhoto= blog.photoPath;
+    // previousPhoto= previousPhoto.split("/").at(-1);
+    // //delete photo
+    // fs.unlinkSync(`storage/${previousPhoto}`)
     
 
     
@@ -256,13 +256,33 @@ response= await cloudinary.uploader.upload(photo)
     return next(error)
 }
 
+
+
+try{
+
 await Blog.updateOne({_id:blogId},{title,content,photoPath:response.url}    )
+}
+catch(err){
+
+    console.log(err)
+    return next(err)
+}
 
 
 
 }
 else{
+
+    try{
+
     await Blog.updateOne({_id:blogId},{title,content})
+    }
+    catch(err){
+        console.log(err)
+        return next(err)
+    }
+
+
 }
 
 res.status(200).json({message:"Updated Successfully"})
