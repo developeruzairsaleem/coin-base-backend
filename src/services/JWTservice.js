@@ -24,7 +24,7 @@ class JWTService {
         try{
 
             const newToken= new RefreshToken({
-                token:token, userId: userId
+                token:token, userid: userId
             })
             await newToken.save()
         }

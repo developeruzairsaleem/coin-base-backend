@@ -20,6 +20,7 @@ const errorHandler=(err,req,res,next)=>{
     if(err.message){
         data.message=err.message;
     }
+    console.log("status:",status,"data",data)
     return res.status(status).json(data)
 }
 

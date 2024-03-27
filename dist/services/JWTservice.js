@@ -33,7 +33,7 @@ class JWTService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const newToken = new RefreshToken({
-                    token: token, userId: userId
+                    token: token, userid: userId
                 });
                 yield newToken.save();
             }

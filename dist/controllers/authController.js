@@ -34,9 +34,9 @@ const authController = {
             }
             // check if email is already registered or not
             const { username, name, email, password } = req.body;
-            const usernameInUse = yield User.exists({ username });
-            const emailInUse = yield User.exists({ email });
             try {
+                const usernameInUse = yield User.exists({ username });
+                const emailInUse = yield User.exists({ email });
                 if (usernameInUse) {
                     const err = {
                         status: 409,
@@ -70,7 +70,7 @@ const authController = {
                 });
                 user = yield userToSave.save();
                 accessToken = JWTService.signAccessToken({ _id: user._id }, "20s");
-                refreshToken = JWTService.signRefreshToken({ _id: user.id }, "5m");
+                refreshToken = JWTService.signRefreshToken({ _id: user._id }, "5m");
             }
             catch (error) {
                 return next(error);
@@ -91,7 +91,7 @@ const authController = {
             });
             // response send
             const userToSend = new UserDto(user);
-            res.status(201).json({ user: userToSend, auth: true });
+            return res.status(201).json({ user: userToSend, auth: true });
         });
     },
     login(req, res, next) {
@@ -138,7 +138,7 @@ const authController = {
             // store in db
             try {
                 yield RefreshToken.updateOne({
-                    _id: user._id
+                    userid: user._id
                 }, {
                     token: refreshToken
                 }, { upsert: true });
@@ -179,6 +179,7 @@ const authController = {
     },
     refresh(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("refreshingggggg");
             // 1  get refresh token from cookies
             const originalRefreshToken = req.cookies.refreshToken;
             // 2  verify refresh token
@@ -190,8 +191,8 @@ const authController = {
                 return next(err);
             }
             try {
-                const match = yield RefreshToken.findOne({ _id: id, token: originalRefreshToken });
-                if (!match) {
+                const tokenAvailable = yield RefreshToken.findOne({ userid: id });
+                if (!tokenAvailable) {
                     const error = {
                         status: 401,
                         message: "Unauthorized user"
@@ -206,7 +207,7 @@ const authController = {
             try {
                 const accessToken = JWTService.signAccessToken({ _id: id }, "20s");
                 const refreshToken = JWTService.signRefreshToken({ _id: id }, "5m");
-                yield RefreshToken.updateOne({ _id: id }, { token: refreshToken });
+                yield RefreshToken.updateOne({ userid: id }, { token: refreshToken });
                 res.cookie("accessToken", accessToken, {
                     maxAge: 1000 * 60 * 60 * 24,
                     httpOnly: true,

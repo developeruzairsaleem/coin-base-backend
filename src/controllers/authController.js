@@ -32,10 +32,11 @@ if(error){
 return next(error)
 }
 // check if email is already registered or not
-const{username,name,email,password}=req.body
-const usernameInUse = await User.exists({username})
-const emailInUse = await User.exists({email})
+const{username,name,email,password}=req.body;
 try{
+
+const usernameInUse = await User.exists({username});
+const emailInUse = await User.exists({email})
 
     if(usernameInUse){
         const err = {
@@ -75,7 +76,7 @@ try {
     })
     user= await userToSave.save()
     accessToken= JWTService.signAccessToken({_id:user._id},"20s")
-    refreshToken= JWTService.signRefreshToken({_id:user.id},"5m")
+    refreshToken= JWTService.signRefreshToken({_id:user._id},"5m")
     
 
 
@@ -106,18 +107,7 @@ res.cookie("refreshToken",refreshToken,{
 // response send
 
 const userToSend= new UserDto(user)
-res.status(201).json({user:userToSend,auth:true})
-
-
-
-
-
-
-
-
-
-
-
+return res.status(201).json({user:userToSend,auth:true})
 
 
 
@@ -168,7 +158,7 @@ const refreshToken= JWTService.signRefreshToken({_id:user._id},"5m")
 try{
 
    await RefreshToken.updateOne({
-        _id:user._id
+        userid:user._id
 },
 {
     token: refreshToken
@@ -224,6 +214,7 @@ res.clearCookie("refreshToken")
 res.status(200).json({user:null,auth:false})
 },
 async refresh(req,res,next){
+    console.log("refreshingggggg")
 // 1  get refresh token from cookies
 const originalRefreshToken = req.cookies.refreshToken;
 // 2  verify refresh token
@@ -236,8 +227,8 @@ catch(err){
 }
 
 try{
-const match= await RefreshToken.findOne({_id:id,token:originalRefreshToken})
-if(!match){
+const tokenAvailable= await RefreshToken.findOne({userid:id})
+if(!tokenAvailable){
     const error={
         status: 401,
         message: "Unauthorized user"
@@ -255,7 +246,7 @@ try {
     const accessToken=JWTService.signAccessToken({_id:id},"20s");
     const refreshToken= JWTService.signRefreshToken({_id:id},"5m")
 
-    await RefreshToken.updateOne({_id:id},{token:refreshToken})
+    await RefreshToken.updateOne({userid:id},{token:refreshToken})
     res.cookie("accessToken",accessToken,{
         maxAge:1000*60*60*24,
         httpOnly:true,
