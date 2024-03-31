@@ -201,7 +201,6 @@ const authController = {
     },
     refresh(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("refreshingggggg");
             // 1  get refresh token from cookies
             const originalRefreshToken = req.cookies.refreshToken;
             // 2  verify refresh token
@@ -255,7 +254,6 @@ const authController = {
                 return next(err);
             }
             return res.status(200).json({ user: userDTO, auth: true });
-            // 4  update db return response
         });
     }
 };
