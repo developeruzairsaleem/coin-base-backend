@@ -23,7 +23,8 @@ const profileController = {
         return __awaiter(this, void 0, void 0, function* () {
             // 1 created the schema for validation of the profile picture in my app
             const profileSchema = Joi.object({
-                photo: Joi.string().required(),
+                name: Joi.string().required,
+                username: Joi.string().require(),
                 author: Joi.string().regex(mongodbIdPattern).required()
             });
             const { error } = profileSchema.validate(req.body);
@@ -32,13 +33,13 @@ const profileController = {
                 return next(error);
             }
             console.log("step 1 completed");
-            const { photo, author } = req.body;
+            const { photo, author, name, username } = req.body;
             let response;
             try {
                 response = yield cloudinary.uploader.upload(photo);
             }
             catch (error) {
-                console.log("here is the error of upload" + JSON.stringify(error, null, 2));
+                console.log("here is the error of upload");
                 return next(error);
             }
             console.log("step 2 completed");

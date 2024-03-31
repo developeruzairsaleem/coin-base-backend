@@ -14,7 +14,8 @@ const profileController={
     async profile(req,res,next){
 // 1 created the schema for validation of the profile picture in my app
         const profileSchema = Joi.object({
-            photo:Joi.string().required(),
+            name:Joi.string().required,
+            username:Joi.string().require(),
             author:Joi.string().regex(mongodbIdPattern).required()
         })
         
@@ -24,7 +25,7 @@ if(error){
     return next(error)
 }
 console.log("step 1 completed")
-const {photo,author}= req.body;
+const {photo,author,name,username}= req.body;
 let response;
 
 try{
@@ -32,16 +33,21 @@ response= await cloudinary.uploader.upload(photo)
 
 }
 catch(error){
-    console.log("here is the error of upload"+JSON.stringify(error,null,2))
+    console.log("here is the error of upload")
     return next(error)
 }
 
 console.log("step 2 completed")
+
+
+
+
+
 let newProfile;
 try{
     
      newProfile= new Profile({
-        photo:response.url ,
+        photo:response.url,
         author:author
     })
     

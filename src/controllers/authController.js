@@ -11,12 +11,9 @@ const authController={
     async register(req,res,next){
 
 
-
-
-// Validate user with express validator
-
-
+        //------------------------------
         //validate user
+        //--------------------------------
         const userRegisterSchema= Joi.object({
             username: Joi.string().max(30).min(5).required(),
             name: Joi.string().max(30).required(),
@@ -24,93 +21,123 @@ const authController={
             password: Joi.string().pattern(passwordPattern).required(),
             confirmPassword: Joi.ref("password")
         })
-const {error}=userRegisterSchema.validate(req.body) 
+
+        //-----------------------------------------------
+        // if error occurs while validating the user data
+        //-----------------------------------------------
+        const {error}=userRegisterSchema.validate(req.body); 
 
 
-// if error in validation return error via middleware
-if(error){
-return next(error)
-}
-// check if email is already registered or not
-const{username,name,email,password}=req.body;
-try{
 
-const usernameInUse = await User.exists({username});
-const emailInUse = await User.exists({email})
+        //-----------------------------------------------
+        // if error in validation return error via middleware
+        //-----------------------------------------------
+        if(error){
+        return next(error)
+        }
 
-    if(usernameInUse){
-        const err = {
-    status : 409,
-    message: "Username already exists"
- }    
- return next(err)
-}
-
-if(emailInUse){
-    const err= {
-        status: 409,
-        message:"Email already exists"
-    }
-    return next(err)
-}
-}
-catch(err){
- return next (err)
-}
-
-// passwordhash
-
-const hashedPassword= await bcrypt.hash(password,10)    
-
-// Store user data in db
-let accessToken;
-let refreshToken;
-let user;
-try {
-    
-    const userToSave = new User({
-        name,
-        username,
-        email,
-        password: hashedPassword
-    })
-    user= await userToSave.save()
-    accessToken= JWTService.signAccessToken({_id:user._id},"20s")
-    refreshToken= JWTService.signRefreshToken({_id:user._id},"5m")
-    
+        // DESCTRUCTIRE USER PAYLOAD
+        const{username,name,email,password}=req.body;
 
 
 
 
-} catch (error) {
-    return next(error)
-}
-// Store refresh token in db
-await JWTService.storeRefreshToken(refreshToken,user._id)
+
+        //--------------------------------------------------------
+        // check if EMAIL OR USERNAME is already registered or not
+        //--------------------------------------------------------
+        try{
+
+            const usernameInUse = await User.exists({username});
+            const emailInUse = await User.exists({email})
+
+            if(usernameInUse){
+                const err = {
+                status : 409,
+                message: "Username already exists"
+                }    
+                return next(err)
+            }
+            
+            if(emailInUse){
+                const err= {
+                    status: 409,
+                    message:"Email already exists"
+                }
+                return next(err)
+            }
+        }
+        catch(err){
+         return next (err)
+        }
 
 
 
-res.cookie("accessToken",accessToken,{
-    maxAge:1000*60*60*24, 
-    httpOnly:true,
-    sameSite:"None",
-    secure:true
-})
-res.cookie("refreshToken",refreshToken,{
-    maxAge:1000*60*60*24, 
-    httpOnly:true, 
-    sameSite:"None",
-    secure:true
-})
-
-
-// response send
-
-const userToSend= new UserDto(user)
-return res.status(201).json({user:userToSend,auth:true})
 
 
 
+        //---------------------------------------
+        // LET'S HASH THE PASSWORD TO STORE IN MONGO
+        //---------------------------------------
+        try{
+
+            const hashedPassword= await bcrypt.hash(password,10)    
+        }
+        catch(err){
+            return next(err);
+        }
+
+
+        // ----------------------------------
+        // Store user data in db
+        // ----------------------------------
+
+        let accessToken;
+        let refreshToken;
+        let user;
+        try {
+            
+            const userToSave = new User({
+                name,
+                username,
+                email,
+                password: hashedPassword
+            })
+            user= await userToSave.save()
+            accessToken= JWTService.signAccessToken({_id:user._id},"30m")
+            refreshToken= JWTService.signRefreshToken({_id:user._id},"600m")
+            
+
+
+
+
+        } catch (error) {
+            return next(error)
+        }
+        //--------------------------
+        // Store refresh token in db
+        //--------------------------  
+        await JWTService.storeRefreshToken(refreshToken,user._id)
+
+        res.cookie("accessToken",accessToken,{
+            maxAge:1000*60*60*24, 
+            httpOnly:true,
+            sameSite:"None",
+            secure:true
+        })
+        res.cookie("refreshToken",refreshToken,{
+            maxAge:1000*60*60*24, 
+            httpOnly:true, 
+            sameSite:"None",
+            secure:true
+        })
+
+        //----------------
+        // response send
+        //---------------
+
+        const userToSend= new UserDto(user)
+        return res.status(201).json({user:userToSend,auth:true})
 
 },
 async login(req,res,next){
@@ -152,8 +179,8 @@ catch(error){
     return next(error)
 }
 //tokens 
-const accessToken= JWTService.signAccessToken({_id:user._id},"20s")
-const refreshToken= JWTService.signRefreshToken({_id:user._id},"5m")
+const accessToken= JWTService.signAccessToken({_id:user._id},"30m")
+const refreshToken= JWTService.signRefreshToken({_id:user._id},"600m")
 // store in db
 try{
 
@@ -243,8 +270,8 @@ catch(err){
 }
 // 3  generate new tokens
 try {
-    const accessToken=JWTService.signAccessToken({_id:id},"20s");
-    const refreshToken= JWTService.signRefreshToken({_id:id},"5m")
+    const accessToken=JWTService.signAccessToken({_id:id},"30m");
+    const refreshToken= JWTService.signRefreshToken({_id:id},"8h")
 
     await RefreshToken.updateOne({userid:id},{token:refreshToken})
     res.cookie("accessToken",accessToken,{

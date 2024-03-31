@@ -18,8 +18,9 @@ const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,25}$/;
 const authController = {
     register(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Validate user with express validator
+            //------------------------------
             //validate user
+            //--------------------------------
             const userRegisterSchema = Joi.object({
                 username: Joi.string().max(30).min(5).required(),
                 name: Joi.string().max(30).required(),
@@ -27,13 +28,21 @@ const authController = {
                 password: Joi.string().pattern(passwordPattern).required(),
                 confirmPassword: Joi.ref("password")
             });
+            //-----------------------------------------------
+            // if error occurs while validating the user data
+            //-----------------------------------------------
             const { error } = userRegisterSchema.validate(req.body);
+            //-----------------------------------------------
             // if error in validation return error via middleware
+            //-----------------------------------------------
             if (error) {
                 return next(error);
             }
-            // check if email is already registered or not
+            // DESCTRUCTIRE USER PAYLOAD
             const { username, name, email, password } = req.body;
+            //--------------------------------------------------------
+            // check if EMAIL OR USERNAME is already registered or not
+            //--------------------------------------------------------
             try {
                 const usernameInUse = yield User.exists({ username });
                 const emailInUse = yield User.exists({ email });
@@ -55,9 +64,18 @@ const authController = {
             catch (err) {
                 return next(err);
             }
-            // passwordhash
-            const hashedPassword = yield bcrypt.hash(password, 10);
+            //---------------------------------------
+            // LET'S HASH THE PASSWORD TO STORE IN MONGO
+            //---------------------------------------
+            try {
+                const hashedPassword = yield bcrypt.hash(password, 10);
+            }
+            catch (err) {
+                return next(err);
+            }
+            // ----------------------------------
             // Store user data in db
+            // ----------------------------------
             let accessToken;
             let refreshToken;
             let user;
@@ -69,13 +87,15 @@ const authController = {
                     password: hashedPassword
                 });
                 user = yield userToSave.save();
-                accessToken = JWTService.signAccessToken({ _id: user._id }, "20s");
-                refreshToken = JWTService.signRefreshToken({ _id: user._id }, "5m");
+                accessToken = JWTService.signAccessToken({ _id: user._id }, "30m");
+                refreshToken = JWTService.signRefreshToken({ _id: user._id }, "600m");
             }
             catch (error) {
                 return next(error);
             }
+            //--------------------------
             // Store refresh token in db
+            //--------------------------  
             yield JWTService.storeRefreshToken(refreshToken, user._id);
             res.cookie("accessToken", accessToken, {
                 maxAge: 1000 * 60 * 60 * 24,
@@ -89,7 +109,9 @@ const authController = {
                 sameSite: "None",
                 secure: true
             });
+            //----------------
             // response send
+            //---------------
             const userToSend = new UserDto(user);
             return res.status(201).json({ user: userToSend, auth: true });
         });
@@ -133,8 +155,8 @@ const authController = {
                 return next(error);
             }
             //tokens 
-            const accessToken = JWTService.signAccessToken({ _id: user._id }, "20s");
-            const refreshToken = JWTService.signRefreshToken({ _id: user._id }, "5m");
+            const accessToken = JWTService.signAccessToken({ _id: user._id }, "30m");
+            const refreshToken = JWTService.signRefreshToken({ _id: user._id }, "600m");
             // store in db
             try {
                 yield RefreshToken.updateOne({
@@ -205,8 +227,8 @@ const authController = {
             }
             // 3  generate new tokens
             try {
-                const accessToken = JWTService.signAccessToken({ _id: id }, "20s");
-                const refreshToken = JWTService.signRefreshToken({ _id: id }, "5m");
+                const accessToken = JWTService.signAccessToken({ _id: id }, "30m");
+                const refreshToken = JWTService.signRefreshToken({ _id: id }, "8h");
                 yield RefreshToken.updateOne({ userid: id }, { token: refreshToken });
                 res.cookie("accessToken", accessToken, {
                     maxAge: 1000 * 60 * 60 * 24,
