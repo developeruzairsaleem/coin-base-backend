@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken")
-const {ACCESS_TOKEN_SECRET,REFRESH_TOKEN_SECRET}=require("../config/index.js")
-const RefreshToken= require("../models/token.js")
+const jwt = require("jsonwebtoken");
+const {ACCESS_TOKEN_SECRET,REFRESH_TOKEN_SECRET}=require("../config/index.js");
+const RefreshToken= require("../models/token.js");
 class JWTService {
     //Sign access token
     static signAccessToken(payload,expiryTime){
@@ -17,19 +17,18 @@ class JWTService {
     }
     //Verify refresh token
     static verifyRefreshToken(token){
-        return jwt.verify(token,REFRESH_TOKEN_SECRET)
+        return jwt.verify(token,REFRESH_TOKEN_SECRET);
     }
     //Store refresh token
     static async storeRefreshToken(token,userId){
         try{
-
             const newToken= new RefreshToken({
                 token:token, userid: userId
-            })
-            await newToken.save()
+            });
+            await newToken.save();
         }
         catch(err){
-            console.log(err)
+            console.log(err);
         }
     }
 

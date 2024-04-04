@@ -17,7 +17,7 @@ const auth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () 
         if (!refreshToken || !accessToken) {
             const error = {
                 status: 401,
-                message: "Unauthorized request"
+                message: "Unauthorized request",
             };
             return next(error);
         }
@@ -31,6 +31,7 @@ const auth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () 
         let user;
         try {
             user = yield User.findOne({ _id: _id });
+            console.log("User in the middleware:", user);
         }
         catch (err) {
             return next(err);

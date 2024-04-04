@@ -153,9 +153,9 @@ async login(req,res,next){
     }
     //match username and password
     const {username,password}=req.body;
-    let user
+    let user;
     try{
-        user= await User.findOne({username})
+        user= await User.findOne({username});
         //match user
         if (!user){
             const error={
@@ -179,8 +179,8 @@ async login(req,res,next){
         return next(error)
     }
     //tokens 
-    const accessToken= JWTService.signAccessToken({_id:user._id},"30m")
-    const refreshToken= JWTService.signRefreshToken({_id:user._id},"600m")
+    const accessToken= JWTService.signAccessToken({_id:user._id},"30m");
+    const refreshToken= JWTService.signRefreshToken({_id:user._id},"600m");
     // store in db
     try{
 

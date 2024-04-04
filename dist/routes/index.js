@@ -4,8 +4,9 @@ const router = express.Router();
 const authController = require("../controllers/authController.js");
 const blogController = require("../controllers/blogController.js");
 const commentController = require("../controllers/commentController.js");
-const profileController = require("../controllers/profileController.js");
+const profileController = require("../controllers/ProfileController/profileController.js");
 const auth = require("../middlewares/auth.js");
+//testing api
 router.get("/test", (req, res) => res.json("Working"));
 //register
 router.post("/register", authController.register);
@@ -25,10 +26,10 @@ router.get("/blog/:id", auth, blogController.getById);
 router.delete("/blog/:id", auth, blogController.delete);
 //update blog
 router.put("/blog/:id", auth, blogController.update);
-// create comment
+//create comment
 router.post("/comment", auth, commentController.create);
-// get comments by id
+//get comments by id
 router.get("/comment/:id", auth, commentController.getById);
-// post profile picture
-router.post("/profile", auth, profileController.profile);
+//update profile picture or info
+router.put("/profile", auth, profileController.profileUpdate);
 module.exports = router;

@@ -1,8 +1,6 @@
-const dotenv=require("dotenv").config()
-
-
-
-
+import {config} from 'dotenv';
+config()
+// const dotenv=require("dotenv").config()
 interface envInterface{
     PORT:string|undefined;
     MONGODB_CONNECTION_STRING:string|undefined;
@@ -25,5 +23,8 @@ const envObj: envInterface = {
  API_KEY : process.env.API_KEY,
  CLOUD_NAME: process.env.CLOUD_NAME,
 }
+
+
+
 
 module.exports=envObj;
