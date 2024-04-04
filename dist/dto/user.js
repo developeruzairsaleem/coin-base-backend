@@ -5,6 +5,7 @@ class UserDto {
         this.username = user.username;
         this._id = user._id;
         this.email = user.email;
+        this.profilePhoto = user.profilePhoto;
     }
 }
 module.exports = UserDto;

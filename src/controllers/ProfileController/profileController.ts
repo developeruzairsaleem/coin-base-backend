@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import UserInterface from "./UserInterface";
+import { boolean } from "joi";
+const UserDto = require("../../dto/user");
 const User = require("../../models/user.js");
 const Joi = require("joi");
 // -----------------------------------------
@@ -27,6 +29,15 @@ interface profileController {
   profileUpdate: Function;
 }
 
+const usernameAvailable = async (
+  userId: string,
+  username: string
+): Promise<boolean> => {
+  const user = await User.findOne({ username, _id: { $ne: userId } });
+
+  return !user;
+};
+
 // ------------------------------------------------------
 // main controller object for profile related controllers
 // ---------------------------------------------------
@@ -46,7 +57,7 @@ const profileController: profileController = {
     // 2 - define the validation schema  for request body
     // 3 - validate the request body
     // 4 - validate the base 64 string of the profile photo
-    // 5 - [interpreting]check if the updated username already exist in database
+    // 5 - check if the updated username already exist in database
     // 5 - see if the user added the photo then update the photo as well
     // 6 - else just update the remaining req body
     // 7 - send the response to the client
@@ -62,6 +73,7 @@ const profileController: profileController = {
     });
 
     // 3 - validate the request body
+    // 4 - validate the base 64 string
     const { error } = profileSchema.validate(req.body);
     if (error) {
       console.log("here is the error of validation " + error);
@@ -69,51 +81,52 @@ const profileController: profileController = {
     }
     const { name, username, profilePhoto } = req.body;
 
-    // 2
-    console.log(req.user);
-    console.log(req.user._id.toString());
-    return res.status(200).json({ user: req.user });
-    console.log("step 1 completed");
+    // 5 - check if the updated username already exists in the database
+    try {
+        const isAvailable = await usernameAvailable(extractedUserId,username)
+        if(!isAvailable){
+            const error = {
+                status:409,
+                message:"Username already exist"
+            }
+            return next(error)
+        }
+    } catch (error) {
+        return next (error)
+    }
+
+
+    // 6 - if the user did not added the photo then just update the remaining request body
+    if(!profilePhoto){
+        try {   
+            const updatedProfile ={
+                username,name
+            }
+            const updatedUser = await User.findByIdAndUpdate(extractedUserId,updatedProfile,{new:true});
+            const userToSend = new UserDto(updatedUser);
+            return res.status(200).json({data:userToSend});
+        } catch (error) {
+            return next(error)
+        }
+    }
+    // 7 - else also update the profile photo as well with the profile info
+
     let response;
-
     try {
-      response = await cloudinary.uploader.upload(photo);
+      response = await cloudinary.uploader.upload(profilePhoto);
     } catch (error) {
-      console.log("here is the error of upload");
       return next(error);
     }
 
-    console.log("step 2 completed");
-
-    // let newProfile;
-    try {
-      //  newProfile= new Profile({
-      //     photo:response.url,
-      //     author:author
-      // })
-      // await newProfile.save()
-    } catch (error) {
-      console.log("here is the error of db" + error);
-      return next(error);
+    const updatedProfile = {
+        name,username,profilePhoto:response.url
     }
-    console.log("step 3 completed");
-
-    res.status(201).json({ data: "nothing for now" });
+    const updatedUser = await User.findByIdAndUpdate(extractedUserId,updatedProfile,{new:true})
+    const userToSend = new UserDto(updatedUser)
+    return res.status(200).json({data:userToSend})
   },
 };
 
 module.exports = profileController;
 
-// bfs(g,node,visited):
-//     visited.append node
-//     queue.append node
 
-//     while queue:
-//         m = queue[0]
-//     visited.append m
-//         queue.pop
-
-//         for(neighbor in g[q]){
-//            if(neighbor not in visited)
-//               queue.append neighbor
-//         }
