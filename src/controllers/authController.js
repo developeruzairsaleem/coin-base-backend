@@ -74,14 +74,14 @@ const authController={
 
 
 
-
+        let hashedPassword;
 
         //---------------------------------------
         // LET'S HASH THE PASSWORD TO STORE IN MONGO
         //---------------------------------------
         try{
 
-            const hashedPassword= await bcrypt.hash(password,10)    
+             hashedPassword= await bcrypt.hash(password,10)    
         }
         catch(err){
             return next(err);

@@ -29,6 +29,12 @@ interface profileController {
   profileUpdate: Function;
 }
 
+
+
+//------------------------------------------
+// is username available for the update in db or is already taken
+//------------------------------------------
+
 const usernameAvailable = async (
   userId: string,
   username: string
@@ -69,7 +75,7 @@ const profileController: profileController = {
     const profileSchema = Joi.object({
       name: Joi.string().required(),
       username: Joi.string().required(),
-      profilePhoto: Joi.string().regex(profilePhotoRegEx),
+      profilePhoto: Joi.string().allow("").regex(profilePhotoRegEx),
     });
 
     // 3 - validate the request body
@@ -79,6 +85,10 @@ const profileController: profileController = {
       console.log("here is the error of validation " + error);
       return next(error);
     }
+
+
+
+    // extract the data
     const { name, username, profilePhoto } = req.body;
 
     // 5 - check if the updated username already exists in the database
@@ -97,7 +107,7 @@ const profileController: profileController = {
 
 
     // 6 - if the user did not added the photo then just update the remaining request body
-    if(!profilePhoto){
+    if(profilePhoto !== "" && !profilePhoto){
         try {   
             const updatedProfile ={
                 username,name
@@ -109,21 +119,20 @@ const profileController: profileController = {
             return next(error)
         }
     }
-    // 7 - else also update the profile photo as well with the profile info
-
-    let response;
-    try {
-      response = await cloudinary.uploader.upload(profilePhoto);
-    } catch (error) {
-      return next(error);
+    // 7 - if profilephoto is not an empty string and is a valid image then upload it
+    let updatedProfile = {name,username,profilePhoto:""}
+    if(profilePhoto){
+      try {
+        const response = await cloudinary.uploader.upload(profilePhoto);
+        updatedProfile.profilePhoto = response.url;
+      } catch (error) {
+        return next(error);
+      }
     }
-
-    const updatedProfile = {
-        name,username,profilePhoto:response.url
-    }
-    const updatedUser = await User.findByIdAndUpdate(extractedUserId,updatedProfile,{new:true})
-    const userToSend = new UserDto(updatedUser)
-    return res.status(200).json({data:userToSend})
+      const updatedUser = await User.findByIdAndUpdate(extractedUserId,updatedProfile,{new:true})
+      const userToSend = new UserDto(updatedUser)
+      return res.status(200).json({data:userToSend})
+    
   },
 };
 

@@ -64,11 +64,12 @@ const authController = {
             catch (err) {
                 return next(err);
             }
+            let hashedPassword;
             //---------------------------------------
             // LET'S HASH THE PASSWORD TO STORE IN MONGO
             //---------------------------------------
             try {
-                const hashedPassword = yield bcrypt.hash(password, 10);
+                hashedPassword = yield bcrypt.hash(password, 10);
             }
             catch (err) {
                 return next(err);
