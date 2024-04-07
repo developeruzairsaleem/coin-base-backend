@@ -108,7 +108,7 @@ const profileController = {
             }
             const updatedUser = yield User.findByIdAndUpdate(extractedUserId, updatedProfile, { new: true });
             const userToSend = new UserDto(updatedUser);
-            return res.status(200).json({ data: userToSend });
+            return res.status(200).json({ data: userToSend, auth: true });
         });
     },
 };
