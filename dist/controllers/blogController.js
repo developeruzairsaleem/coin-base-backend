@@ -105,7 +105,7 @@ const blogController = {
     getAll(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const blogs = yield Blog.find({});
+                const blogs = yield Blog.find({}).populate("author");
                 const blogAll = [];
                 for (let i = 0; i < blogs.length; i++) {
                     const blogDto = new BlogDto(blogs[i]);

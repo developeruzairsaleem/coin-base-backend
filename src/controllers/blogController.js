@@ -122,15 +122,12 @@ return res.status(200).json({blog:blogDTO})
 },
 async getAll(req,res,next){
 try {
-    const blogs = await Blog.find({});
+    const blogs = await Blog.find({}).populate("author");
     const blogAll= [];
     for(let i=0; i<blogs.length;i++){
     const blogDto= new BlogDto(blogs[i])
     blogAll.push(blogDto)
     }
-
-
-
 
 res.status(200).json({blogs:blogAll})
 

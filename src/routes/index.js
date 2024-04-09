@@ -18,7 +18,7 @@ router.get("/refresh",authController.refresh)
 //create
 router.post("/blog",auth,blogController.create)
 //getAll
-router.get("/blog/all/:val",auth,blogController.getAll)
+router.get("/blog/all",auth,blogController.getAll)
 //get blog by id
 router.get("/blog/:id",auth,blogController.getById)
 // delete blog by id
