@@ -3,7 +3,7 @@ class BlogDetailDto{
         this._id=blog._id
         this.createdAt=blog.createdAt
         this.title=blog.title
-        this.description= blog.description
+        this.category= blog.category
         this.content=blog.content
         this.authorName=blog.author.name
         this.authorUsername=blog.author.username

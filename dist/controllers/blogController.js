@@ -33,7 +33,7 @@ const blogController = {
             const createBlogSchema = Joi.object({
                 title: Joi.string().required(),
                 content: Joi.string().required(),
-                description: Joi.string().required(),
+                category: Joi.string().required(),
                 author: Joi.string().regex(mongodbIdPattern).required(),
                 photo: Joi.string().required()
             });
@@ -43,7 +43,7 @@ const blogController = {
                 console.log(error, "validation error");
                 return next();
             }
-            const { title, author, content, photo, description } = req.body;
+            const { title, author, content, photo, category } = req.body;
             // read photo as a buffer
             // const buffer = Buffer.from(photo.replace(/^data:image\/(png|jpg|jpeg);base64,/,""),"base64");
             // allot a random number
@@ -63,7 +63,7 @@ const blogController = {
             try {
                 newBlog = new Blog({
                     author,
-                    description,
+                    category,
                     content,
                     title,
                     photoPath: response.url

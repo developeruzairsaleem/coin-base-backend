@@ -15,6 +15,9 @@ app.use(cors({
     optionsSuccessStatus: 200,
     credentials: true
 }));
+// hello this is the text file for the update content of the new data
+// so what we are doing 
+// is very fun little exercise in vim
 // app.use("/storage",express.static("storage"))
 app.use(cookieParser());
 app.use(express.json({ limit: "50mb" }));

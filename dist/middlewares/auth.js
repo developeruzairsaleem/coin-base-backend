@@ -38,6 +38,7 @@ const auth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () 
         }
         const userDTO = new UserDto(user);
         req.user = userDTO;
+        req.body.author = _id;
         next();
     }
     catch (err) {

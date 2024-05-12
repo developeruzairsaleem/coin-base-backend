@@ -26,7 +26,7 @@ async create(req,res,next){
 const createBlogSchema= Joi.object({
     title:Joi.string().required(),
     content:Joi.string().required(),
-    description:Joi.string().required(),
+    category:Joi.string().required(),
     author: Joi.string().regex(mongodbIdPattern).required(),
     photo: Joi.string().required()
 })
@@ -38,7 +38,7 @@ console.log(error,"validation error")
 
     return next()
 }
-const {title,author,content,photo,description}=req.body
+const {title,author,content,photo,category}=req.body
 
 // read photo as a buffer
 // const buffer = Buffer.from(photo.replace(/^data:image\/(png|jpg|jpeg);base64,/,""),"base64");
@@ -65,7 +65,7 @@ try {
 
     newBlog= new Blog({
     author,
-    description,
+    category,
     content,
     title,
     photoPath:response.url
@@ -90,9 +90,9 @@ res.status(201).json({blog:myBlogDto})
 
 },
 async getById(req,res,next){
-const getByIdSchema = Joi.object({   
+    const getByIdSchema = Joi.object({   
     id: Joi.string().regex(mongodbIdPattern).required()
-})
+    })
 
 const {error}= getByIdSchema.validate(req.params)
 

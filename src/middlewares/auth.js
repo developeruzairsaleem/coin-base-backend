@@ -27,6 +27,7 @@ const auth = async (req, res, next) => {
     }
     const userDTO = new UserDto(user);
     req.user = userDTO;
+    req.body.author = _id;
     next();
   } catch (err) {
     return next(err);
